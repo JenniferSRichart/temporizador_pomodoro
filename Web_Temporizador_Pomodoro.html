@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temporizador Pomodoro</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .timer {
+            font-size: 3rem;
+            color: #2c3e50;
+        }
+        body {
+            background-color: #e4cea8; /* Color de fondo coincidente con la imagen */
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+    <div class="p-5 bg-white rounded-lg shadow-lg">
+        <!-- Imagen del reloj en forma de tomate aquí -->
+        <div class="image-container text-center mb-4">
+            <img src="pomodoro.png" alt="Tomato Clock" class="mx-auto" style="max-width: 150px;">
+        </div>
+        <h1 class="text-2xl font-bold text-center mb-4">Temporizador Pomodoro</h1>
+        <div class="timer flex justify-center items-center mb-4" id="timer">25:00</div>
+        <div class="controls flex justify-between mb-4">
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="startTimer()">Iniciar</button>
+            <button class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded" onclick="pauseTimer()">Pausar</button>
+            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="resetTimer()">Reiniciar</button>
+        </div>
+        <div class="completed text-center">Pomodoros completados: <span id="completed">0</span></div>
+        <p class="text-sm mt-4">
+            La técnica Pomodoro es un método para mejorar la administración del tiempo dividiendo el trabajo en intervalos de 25 minutos, separados por breves descansos. Mejora la productividad y la eficiencia en el trabajo por varias razones clave que se alinean con cómo nuestro cerebro maneja mejor las tareas y la fatiga. Aquí te detallo algunas de estas razones:
+        </p>
+    * Ayuda a mantener el enfoque en una sola tarea a la vez, minimizando las distracciones.
+        </p>
+    * Te obliga a trabajar con el tiempo en lugar de luchar contra él.
+        </p>
+    * Al alternar sesiones de trabajo con descansos, se reduce la tensión mental y física, lo que permite mantener un rendimiento constante a lo largo del día.
+        </p>
+    </div>
+
+    <audio id="alarmSound" src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3"></audio>
+
+    <script>
+        let isRunning = false, pomodoroCount = 0;
+        let workTime = 25 * 60, breakTime = 5 * 60, secondsLeft = workTime;
+        let timerInterval;
+
+        function updateDisplay() {
+            let minutes = Math.floor(secondsLeft / 60);
+            let seconds = secondsLeft % 60;
+            document.getElementById("timer").textContent = minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
+        }
+
+        function startTimer() {
+            if (!isRunning) {
+                isRunning = true;
+                timerInterval = setInterval(() => {
+                    secondsLeft--;
+                    updateDisplay();
+                    if (secondsLeft <= 0) {
+                        clearInterval(timerInterval);
+                        document.getElementById("alarmSound").play();
+                        pomodoroCount++;
+                        document.getElementById("completed").textContent = pomodoroCount;
+                        secondsLeft = (pomodoroCount % 4 === 0) ? breakTime : workTime;
+                        startTimer();
+                    }
+                }, 1000);
+            }
+        }
+
+        function pauseTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+        }
+
+        function resetTimer() {
+            pauseTimer();
+            secondsLeft = workTime;
+            updateDisplay();
+        }
+
+        updateDisplay();
+    </script>
+</body>
+</html>
